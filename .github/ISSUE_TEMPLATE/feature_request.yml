@@ -1,0 +1,36 @@
+name: Feature request
+description: Suggest an idea or improvement for Root
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for sharing your idea. Please describe the feature and the problem it solves.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or limitation
+      description: Is your feature request related to a problem? Please describe.
+      placeholder: |
+        I often need to ... but Root currently does not support it.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe the feature or behavior you'd like to see.
+      placeholder: |
+        Add a command or flag that ...
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Describe any alternative solutions or workarounds you've considered.
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add screenshots, examples, or any other relevant details.

@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "root-cli"
+version = "0.1.0"
+description = "Type plain English in any terminal. Get the right shell command."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.9"
+authors = [{ name = "Fisarum", email = "hello@fisarum.com" }]
+keywords = ["cli", "shell", "ai", "terminal", "nlp", "command"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Topic :: Terminals",
+    "Topic :: Utilities",
+]
+dependencies = [
+    "click>=8.1",
+    "httpx>=0.27",
+    "rich>=13.0",
+    "pyperclip>=1.8",
+    "tomli>=2.0; python_version < '3.11'",
+    "tomli-w>=1.0",
+]
+
+[project.scripts]
+root = "root.cli:main"
+
+[project.urls]
+Homepage = "https://fisarum.com"
+Repository = "https://github.com/fisarum/root-cli"
+Issues = "https://github.com/fisarum/root-cli/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["root"]
