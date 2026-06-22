@@ -67,6 +67,9 @@ def main(ctx: click.Context, version: bool) -> None:
         console.print(f"root v{__version__} by Fisarum")
         return
 
+    if not version and ctx.invoked_subcommand not in ("version", "update"):
+        _notify_update_if_needed()
+
     if ctx.invoked_subcommand is None and not ctx.meta.get("is_query"):
         from root.session import start
         start()
@@ -285,6 +288,112 @@ def plugins_cmd(install: bool) -> None:
     )
 
 
+@main.command()
+def version() -> None:
+    """Show the installed Root version and check for updates."""
+    from root.version import check_for_update, get_installed_version
+
+    current = get_installed_version()
+    console.print()
+    console.print(f"  [bold]root v{current}[/bold] by Fisarum")
+
+    info = check_for_update(force=True)
+    latest = info.get("latest")
+    if latest:
+        if info.get("update_available"):
+            console.print(
+                f"  [{WARNING}]Update available:[/{WARNING}] v{latest} "
+                f"[{FG_DIM}](you have v{current})[/{FG_DIM}]"
+            )
+            console.print(
+                f"  [{FG_DIM}]Run [bold]root update[/bold] to upgrade.[/{FG_DIM}]"
+            )
+        else:
+            console.print(
+                f"  [{SUCCESS}]You are on the latest version.[/{SUCCESS}]"
+            )
+    else:
+        console.print(
+            f"  [{FG_DIM}]Could not check for updates right now.[/{FG_DIM}]"
+        )
+    console.print()
+
+
+@main.command()
+@click.option("--yes", "-y", is_flag=True, help="Skip the confirmation prompt.")
+def update(yes: bool) -> None:
+    """Update Root to the latest released version."""
+    import sys
+    from root.version import check_for_update, get_installed_version, run_update
+
+    current = get_installed_version()
+    console.print()
+    console.print(f"  [bold]Current version:[/bold] v{current}")
+
+    info = check_for_update(force=True)
+    latest = info.get("latest")
+
+    if latest and not info.get("update_available"):
+        console.print(
+            f"  [{SUCCESS}]Root is already up to date (v{current}).[/{SUCCESS}]"
+        )
+        console.print()
+        return
+
+    if latest:
+        console.print(
+            f"  [{WARNING}]Updating from v{current} to v{latest}...[/{WARNING}]"
+        )
+    else:
+        console.print(
+            f"  [{FG_DIM}]Could not check the latest version; trying to upgrade anyway.[/{FG_DIM}]"
+        )
+
+    if not yes:
+        console.print(
+            f"  [{FG_DIM}]This will run:[/{FG_DIM}] {sys.executable} -m pip install --upgrade root-cli"
+        )
+        try:
+            choice = input("  Proceed? [y/N] ").strip().lower()
+        except (KeyboardInterrupt, EOFError):
+            console.print("\n  Update cancelled.")
+            return
+        if choice not in ("y", "yes"):
+            console.print("  Update cancelled.")
+            return
+
+    success, new_version = run_update()
+    if success:
+        console.print(
+            f"  [{SUCCESS}]Update complete.[/{SUCCESS}] "
+            f"[{FG_DIM}]You are now on v{new_version}. Restart root to use the new version.[/{FG_DIM}]"
+        )
+    else:
+        console.print(
+            f"  [{ERROR}]Update failed.[/{ERROR}] "
+            f"[{FG_DIM}]Try running manually:[/{FG_DIM}] {sys.executable} -m pip install --upgrade root-cli"
+        )
+    console.print()
+
+
+def _notify_update_if_needed() -> None:
+    """Check for updates once per week and suggest upgrading if one is available."""
+    try:
+        from root.version import check_for_update
+
+        info = check_for_update()
+        if info.get("checked") and info.get("update_available"):
+            console.print(
+                f"\n  [{WARNING}]Update available:[/{WARNING}] "
+                f"root v{info['latest']} [{FG_DIM}](you have v{info['current']})[/{FG_DIM}]"
+            )
+            console.print(
+                f"  [{FG_DIM}]Run [bold]root update[/bold] to upgrade.[/{FG_DIM}]\n"
+            )
+    except Exception:
+        pass
+
+
 def _print_config(conf: dict) -> None:
     console.print()
     console.print(f"  [bold]Root Config[/bold]  [{FG_DIM}](~/.root/config.toml)[/{FG_DIM}]\n")
@@ -383,3 +492,7 @@ def _suggest_setup(conf: dict) -> None:
         console.print(
             "  [dim]If this is your first time, run:[/dim]  [bold]root setup[/bold]\n"
         )
+
+
+if __name__ == "__main__":
+    main()

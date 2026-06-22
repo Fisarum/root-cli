@@ -116,6 +116,16 @@ root memory --disable  # disable learning system
 root memory --enable   # enable learning system
 ```
 
+### Version & Updates
+
+```bash
+root version    # show the installed version and check for updates
+root update     # update Root to the latest released version
+root update -y  # update without confirmation
+```
+
+Root checks for new releases once per week. If an update is available, it prints a suggestion to run `root update`. The check result is also logged to `~/.root/version.log`.
+
 ### Session Commands
 
 When in interactive mode, you can use:

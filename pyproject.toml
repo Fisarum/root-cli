@@ -29,7 +29,11 @@ dependencies = [
     "pyperclip>=1.8",
     "tomli>=2.0; python_version < '3.11'",
     "tomli-w>=1.0",
+    "packaging>=22.0",
 ]
+
+[project.optional-dependencies]
+test = ["pytest>=7.0"]
 
 [project.scripts]
 root = "root.cli:main"
